@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Healthcare Chat</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color:#6fa0e4;
+            margin: 0;
+            padding: 0;
+        }
+        #chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #chat-box {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        #user-input {
+            display: flex;
+        }
+        #user-message {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        #send-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f2f2f2;
+        }
+        .user-message {
+            background-color: #e6f2ff;
+        }
+        .bot-message {
+            background-color: #d9ead3;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <h1>Realtime Healthcare Chat</h1>
+        <div id="chat-box"></div>
+        <div id="user-input">
+            <input type="text" id="user-message" placeholder="Type your message...">
+            <button id="send-button" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function sendMessage() {
+            var userMessage = document.getElementById("user-message").value;
+            if (userMessage.trim() === "") return;
+
+            document.getElementById("user-message").value = "";
+            document.getElementById("chat-box").innerHTML += '<div class="message user-message"><strong>You:</strong> ' + userMessage + '</div>';
+            scrollToBottom();
+
+            // Send the message to the server
+            $.ajax({
+                url: '/get_response',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ user_message: userMessage }),
+                success: function(response) {
+                    var botResponse = response.bot_response;
+                    document.getElementById("chat-box").innerHTML += '<div class="message bot-message"><strong>Healthcare Provider:</strong> ' + botResponse + '</div>';
+                    scrollToBottom();
+                }
+            });
+        }
+
+        function scrollToBottom() {
+            var chatBox = document.getElementById("chat-box");
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
